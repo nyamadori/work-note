@@ -1,0 +1,28 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  api:
+    build: ./api
+    volumes:
+      - ./api:/api
+    ports:
+      - "3000:3000"
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    depends_on:
+      - db
+  front:
+    build: ./front
+    volumes:
+      - ./front:/front
+      - ./front/node_modules:/front/node_modules
+    ports:
+      - "8080:8080"
+    command: bash -c "yarn dev"
+    depends_on:
+      - api
+
+volumes:
+  db_data:
